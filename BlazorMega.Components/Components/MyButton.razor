@@ -1,0 +1,14 @@
+<button class="blazor-mega-btn @Class" @onclick="OnClick">
+    @ChildContent
+</button>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    [Parameter]
+    public string? Class { get; set; }
+}
