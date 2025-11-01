@@ -1,0 +1,29 @@
+@namespace BlazorMega.Components
+
+<button class="btn-mega @CssClass" type="@Type" @onclick="OnClick" disabled="@Disabled">
+    @if (Icon != null)
+    {
+        <span class="btn-icon">@Icon</span>
+    }
+    @ChildContent
+</button>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; } = string.Empty;
+
+  [Parameter]
+    public string Type { get; set; } = "button";
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+}

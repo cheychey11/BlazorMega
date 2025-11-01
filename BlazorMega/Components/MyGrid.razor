@@ -1,0 +1,329 @@
+﻿@namespace BlazorMega.Components
+@typeparam TItem
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+<div class="mega-grid">
+    @if (ShowToolbar && (AllowAdd || ToolbarTemplate != null))
+    {
+   <div class="mega-grid-toolbar">
+   @if (AllowAdd && OnAdd.HasDelegate)
+ {
+         <MyButton Icon="➕" OnClick="HandleAddClick">Add New</MyButton>
+ }
+    @ToolbarTemplate
+   </div>
+ }
+
+    <div class="mega-grid-container">
+ <table class="mega-grid-table">
+<thead>
+     <tr>
+   @if (Selectable)
+ {
+    <th class="mega-grid-checkbox-column">
+     <input type="checkbox" 
+ @onchange="ToggleSelectAll" 
+    checked="@(SelectedItems.Count == CurrentItems.Count && CurrentItems.Any())" />
+      </th>
+  }
+     @foreach (var column in Columns)
+         {
+<th class="@(column.Sortable ? "sortable" : "")" 
+      @onclick="() => HandleSort(column)">
+      <div class="mega-grid-header-content">
+     <span>@column.Title</span>
+@if (column.Sortable && SortColumn == column.Field)
+{
+   <span class="sort-indicator">@(SortAscending ? "▲" : "▼")</span>
+  }
+   @if (column.Filterable)
+ {
+        <span class="filter-indicator" @onclick:stopPropagation="true">🔍</span>
+     }
+ </div>
+        </th>
+           }
+        @if (ShowCommandColumn)
+        {
+        <th class="mega-grid-command-column">Actions</th>
+     }
+</tr>
+@if (Columns.Any(c => c.Filterable))
+     {
+    <tr class="mega-grid-filter-row">
+      @if (Selectable)
+  {
+   <th></th>
+ }
+       @foreach (var column in Columns)
+       {
+    <th>
+       @if (column.Filterable)
+      {
+   <input type="text" 
+      class="mega-grid-filter-input"
+placeholder="Filter..."
+        @bind="column.FilterValue"
+@bind:event="oninput"
+ @onchange="() => ApplyFilter()" />
+        }
+        </th>
+     }
+       @if (ShowCommandColumn)
+   {
+    <th></th>
+     }
+         </tr>
+     }
+   </thead>
+         <tbody>
+     @if (CurrentItems != null && CurrentItems.Any())
+     {
+           @foreach (var item in CurrentItems)
+    {
+     var isSelected = SelectedItems.Contains(item);
+   <tr class="@(isSelected ? "selected" : "")">
+    @if (Selectable)
+      {
+<td class="mega-grid-checkbox-column">
+ <input type="checkbox" 
+     checked="@isSelected"
+   @onchange="() => ToggleSelection(item)" />
+           </td>
+ }
+         @foreach (var column in Columns)
+ {
+     <td>
+       @if (column.Template != null)
+      {
+         @column.Template(item)
+   }
+   else
+    {
+     @GetPropertyValue(item, column.Field)
+     }
+   </td>
+ }
+   @if (ShowCommandColumn)
+      {
+   <td class="mega-grid-command-column">
+ <div class="mega-grid-commands">
+ @if (AllowEdit && OnEdit.HasDelegate)
+    {
+<MyButton Icon="✏️" CssClass="btn-small" OnClick="() => HandleEdit(item)">Edit</MyButton>
+   }
+     @if (AllowDelete && OnDelete.HasDelegate)
+ {
+   <MyButton Icon="🗑️" CssClass="btn-small btn-danger" OnClick="() => HandleDelete(item)">Delete</MyButton>
+   }
+  </div>
+     </td>
+   }
+         </tr>
+      }
+     }
+  else
+     {
+  <tr>
+<td colspan="@GetColumnCount()" class="mega-grid-no-data">
+    @if (NoDataTemplate != null)
+     {
+  @NoDataTemplate
+     }
+           else
+   {
+      <div class="mega-grid-no-data-content">
+  <span>📭</span>
+   <p>No data available</p>
+        </div>
+         }
+</td>
+      </tr>
+      }
+      </tbody>
+</table>
+    </div>
+
+    @if (Pageable && TotalItems > PgSize)
+ {
+   <div class="mega-grid-pager">
+    <div class="pager-info">
+  @GetPagerInfo()
+ </div>
+   <div class="pager-buttons">
+    <MyButton Icon="⏮️" CssClass="btn-small" Disabled="@(CurrentPg == 1)" OnClick="FirstPg">First</MyButton>
+ <MyButton Icon="◀️" CssClass="btn-small" Disabled="@(CurrentPg == 1)" OnClick="PreviousPg">Previous</MyButton>
+      
+          @for (int i = Math.Max(1, CurrentPg - 2); i <= Math.Min(TotalPgs, CurrentPg + 2); i++)
+   {
+  var num = i;
+   var btnClass = num == CurrentPg ? "btn-small active" : "btn-small";
+       <MyButton CssClass="@btnClass" OnClick="() => SetPg(num)">@num</MyButton>
+      }
+    
+    <MyButton Icon="▶️" CssClass="btn-small" Disabled="@(CurrentPg == TotalPgs)" OnClick="NextPg">Next</MyButton>
+   <MyButton Icon="⏭️" CssClass="btn-small" Disabled="@(CurrentPg == TotalPgs)" OnClick="LastPg">Last</MyButton>
+  </div>
+      </div>
+    }
+</div>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public IEnumerable<TItem>? Data { get; set; }
+  [Parameter] public bool Pageable { get; set; } = true;
+  [Parameter] public int PageSize { get; set; } = 10;
+    [Parameter] public bool Selectable { get; set; } = false;
+    [Parameter] public bool AllowEdit { get; set; } = true;
+    [Parameter] public bool AllowDelete { get; set; } = true;
+    [Parameter] public bool AllowAdd { get; set; } = true;
+    [Parameter] public bool ShowToolbar { get; set; } = true;
+    [Parameter] public RenderFragment? ToolbarTemplate { get; set; }
+    [Parameter] public RenderFragment? NoDataTemplate { get; set; }
+    [Parameter] public EventCallback<TItem> OnEdit { get; set; }
+    [Parameter] public EventCallback<TItem> OnDelete { get; set; }
+    [Parameter] public EventCallback OnAdd { get; set; }
+    [Parameter] public EventCallback<List<TItem>> OnSelectionChanged { get; set; }
+
+    private List<GridColumn<TItem>> Columns { get; set; } = new();
+    private List<TItem> SelectedItems { get; set; } = new();
+    private int CurrentPg { get; set; } = 1;
+    private int PgSize => PageSize;
+    private string? SortColumn { get; set; }
+    private bool SortAscending { get; set; } = true;
+    
+    private IEnumerable<TItem> FilteredItems => ApplyFilters(Data ?? Enumerable.Empty<TItem>());
+ private IEnumerable<TItem> SortedItems => ApplySorting(FilteredItems);
+    private int TotalItems => SortedItems.Count();
+    private int TotalPgs => (int)Math.Ceiling((double)TotalItems / PgSize);
+    private List<TItem> CurrentItems => Pageable 
+        ? SortedItems.Skip((CurrentPg - 1) * PgSize).Take(PgSize).ToList()
+: SortedItems.ToList();
+
+    private bool ShowCommandColumn => (AllowEdit && OnEdit.HasDelegate) || (AllowDelete && OnDelete.HasDelegate);
+
+    public void AddColumn(GridColumn<TItem> column)
+    {
+        Columns.Add(column);
+        StateHasChanged();
+    }
+
+    private object? GetPropertyValue(TItem item, string? propertyName)
+    {
+        if (string.IsNullOrEmpty(propertyName) || item == null)
+    return null;
+
+   var property = typeof(TItem).GetProperty(propertyName);
+  return property?.GetValue(item);
+    }
+
+    private void HandleSort(GridColumn<TItem> column)
+    {
+        if (!column.Sortable) return;
+
+ if (SortColumn == column.Field)
+  {
+    SortAscending = !SortAscending;
+   }
+        else
+        {
+            SortColumn = column.Field;
+      SortAscending = true;
+ }
+    }
+
+    private IEnumerable<TItem> ApplySorting(IEnumerable<TItem> items)
+    {
+  if (string.IsNullOrEmpty(SortColumn))
+        return items;
+
+  var property = typeof(TItem).GetProperty(SortColumn);
+  if (property == null)
+ return items;
+
+        return SortAscending
+ ? items.OrderBy(x => property.GetValue(x))
+   : items.OrderByDescending(x => property.GetValue(x));
+  }
+
+    private IEnumerable<TItem> ApplyFilters(IEnumerable<TItem> items)
+    {
+     foreach (var column in Columns.Where(c => c.Filterable && !string.IsNullOrWhiteSpace(c.FilterValue)))
+{
+        var filterValue = column.FilterValue?.ToLower();
+         items = items.Where(item =>
+      {
+     var value = GetPropertyValue(item, column.Field)?.ToString()?.ToLower();
+return value != null && value.Contains(filterValue ?? "");
+         });
+     }
+     return items;
+    }
+
+    private void ApplyFilter()
+    {
+        CurrentPg = 1;
+}
+
+    private void ToggleSelection(TItem item)
+    {
+  if (SelectedItems.Contains(item))
+     SelectedItems.Remove(item);
+        else
+        SelectedItems.Add(item);
+
+   OnSelectionChanged.InvokeAsync(SelectedItems);
+    }
+
+    private void ToggleSelectAll(ChangeEventArgs e)
+    {
+        if ((bool)(e.Value ?? false))
+    {
+   SelectedItems = new List<TItem>(CurrentItems);
+      }
+        else
+        {
+  SelectedItems.Clear();
+  }
+        OnSelectionChanged.InvokeAsync(SelectedItems);
+    }
+
+    private void FirstPg() => CurrentPg = 1;
+    private void LastPg() => CurrentPg = TotalPgs;
+    private void NextPg() => CurrentPg = Math.Min(TotalPgs, CurrentPg + 1);
+    private void PreviousPg() => CurrentPg = Math.Max(1, CurrentPg - 1);
+    private void SetPg(int number) => CurrentPg = number;
+
+    private string GetPagerInfo()
+    {
+        var start = (CurrentPg - 1) * PgSize + 1;
+     var end = Math.Min(CurrentPg * PgSize, TotalItems);
+        return $"{start} - {end} of {TotalItems} items";
+  }
+
+    private int GetColumnCount()
+    {
+        var count = Columns.Count;
+  if (Selectable) count++;
+        if (ShowCommandColumn) count++;
+      return count;
+ }
+
+    private async Task HandleEdit(TItem item)
+ {
+        await OnEdit.InvokeAsync(item);
+    }
+
+    private async Task HandleDelete(TItem item)
+ {
+   await OnDelete.InvokeAsync(item);
+    }
+
+    private async Task HandleAddClick()
+    {
+      await OnAdd.InvokeAsync();
+    }
+}

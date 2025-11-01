@@ -1,0 +1,256 @@
+@page "/grid"
+@rendermode InteractiveServer
+
+<PageTitle>MyGrid Demo - Data Grid</PageTitle>
+
+<div class="container my-5">
+    <h1>MyGrid Component Demo</h1>
+    <p class="lead">A powerful data grid with sorting, filtering, paging, and CRUD operations</p>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm mb-4">
+        <div class="card-body">
+       <h3>Product Inventory</h3>
+     
+        <MyGrid TItem="Product" 
+             Data="@products"
+        Pageable="true"
+          PageSize="10"
+         Selectable="true"
+    AllowEdit="true"
+      AllowDelete="true"
+           AllowAdd="true"
+      OnEdit="HandleEdit"
+      OnDelete="HandleDelete"
+   OnAdd="HandleAdd"
+             OnSelectionChanged="HandleSelectionChanged">
+ 
+               <GridColumn TItem="Product" Field="@nameof(Product.Id)" Title="ID" Sortable="true" Filterable="true" />
+    
+        <GridColumn TItem="Product" Field="@nameof(Product.Name)" Title="Product Name" Sortable="true" Filterable="true">
+   <Template Context="product">
+       <strong>@product.Name</strong>
+       </Template>
+             </GridColumn>
+                  
+      <GridColumn TItem="Product" Field="@nameof(Product.Category)" Title="Category" Sortable="true" Filterable="true">
+  <Template Context="product">
+         <span class="badge bg-primary">@product.Category</span>
+           </Template>
+         </GridColumn>
+   
+     <GridColumn TItem="Product" Field="@nameof(Product.Price)" Title="Price" Sortable="true" Filterable="true">
+            <Template Context="product">
+<span class="text-success fw-bold">$@product.Price.ToString("F2")</span>
+      </Template>
+         </GridColumn>
+     
+       <GridColumn TItem="Product" Field="@nameof(Product.Stock)" Title="In Stock" Sortable="true" Filterable="true">
+                 <Template Context="product">
+              <span class="badge @(product.Stock > 0 ? "bg-success" : "bg-danger")">
+ @product.Stock units
+        </span>
+         </Template>
+              </GridColumn>
+          
+          <GridColumn TItem="Product" Field="@nameof(Product.Available)" Title="Status" Sortable="true" Filterable="false">
+  <Template Context="product">
+            @if (product.Available)
+        {
+            <span class="text-success">? Available</span>
+ }
+    else
+            {
+          <span class="text-danger">? Discontinued</span>
+       }
+ </Template>
+    </GridColumn>
+                  </MyGrid>
+
+         @if (selectedProducts.Any())
+     {
+     <div class="alert alert-info mt-3">
+       <strong>Selected Items:</strong> @selectedProducts.Count product(s) selected
+     </div>
+   }
+      </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+     <div class="col-md-6">
+   <div class="card shadow-sm mb-4">
+     <div class="card-body">
+         <h3>Simple Grid Example</h3>
+            
+         <MyGrid TItem="Employee" 
+           Data="@employees"
+ Pageable="true"
+      PageSize="5"
+      Selectable="false"
+      AllowEdit="false"
+    AllowDelete="false"
+ AllowAdd="false"
+   ShowToolbar="false">
+    
+         <GridColumn TItem="Employee" Field="@nameof(Employee.Name)" Title="Employee" />
+        <GridColumn TItem="Employee" Field="@nameof(Employee.Department)" Title="Department" />
+           <GridColumn TItem="Employee" Field="@nameof(Employee.Salary)" Title="Salary">
+          <Template Context="emp">
+      $@emp.Salary.ToString("N0")
+        </Template>
+          </GridColumn>
+     </MyGrid>
+      </div>
+ </div>
+        </div>
+
+        <div class="col-md-6">
+   <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <h3>Features</h3>
+         <ul class="list-group list-group-flush">
+          <li class="list-group-item">? <strong>Sorting</strong> - Click column headers</li>
+           <li class="list-group-item">? <strong>Filtering</strong> - Filter row below headers</li>
+         <li class="list-group-item">? <strong>Paging</strong> - Navigate through pages</li>
+             <li class="list-group-item">? <strong>Selection</strong> - Select rows with checkboxes</li>
+ <li class="list-group-item">? <strong>Templates</strong> - Custom column rendering</li>
+       <li class="list-group-item">? <strong>CRUD</strong> - Edit and delete operations</li>
+              <li class="list-group-item">? <strong>Responsive</strong> - Mobile-friendly design</li>
+   </ul>
+     </div>
+   </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+      <div class="card-body">
+        <h3>Code Example</h3>
+        <pre class="bg-light p-3 rounded"><code>&lt;MyGrid TItem="Product" 
+     Data="@@products"
+        Pageable="true"
+        PageSize="10"
+        Selectable="true"
+        OnEdit="HandleEdit"
+        OnDelete="HandleDelete"&gt;
+    
+  &lt;GridColumn TItem="Product" 
+            Field="@@nameof(Product.Name)" 
+  Title="Product Name" /&gt;
+    
+    &lt;GridColumn TItem="Product" 
+ Field="@@nameof(Product.Price)" 
+                Title="Price"&gt;
+        &lt;Template Context="product"&gt;
+      $@@product.Price.ToString("F2")
+        &lt;/Template&gt;
+    &lt;/GridColumn&gt;
+&lt;/MyGrid&gt;</code></pre>
+       </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Product> products = new();
+  private List<Employee> employees = new();
+    private List<Product> selectedProducts = new();
+
+    protected override void OnInitialized()
+    {
+        LoadProducts();
+        LoadEmployees();
+    }
+
+    private void LoadProducts()
+    {
+ products = new List<Product>
+        {
+       new Product { Id = 1, Name = "Chai", Category = "Beverages", Price = 18.00m, Stock = 39, Available = true },
+            new Product { Id = 2, Name = "Chang", Category = "Beverages", Price = 19.00m, Stock = 17, Available = true },
+ new Product { Id = 3, Name = "Aniseed Syrup", Category = "Condiments", Price = 10.00m, Stock = 13, Available = true },
+            new Product { Id = 4, Name = "Chef Anton's Cajun Seasoning", Category = "Condiments", Price = 22.00m, Stock = 53, Available = true },
+ new Product { Id = 5, Name = "Grandma's Boysenberry Spread", Category = "Condiments", Price = 25.00m, Stock = 120, Available = true },
+            new Product { Id = 6, Name = "Uncle Bob's Organic Dried Pears", Category = "Produce", Price = 30.00m, Stock = 15, Available = true },
+            new Product { Id = 7, Name = "Northwoods Cranberry Sauce", Category = "Condiments", Price = 40.00m, Stock = 6, Available = true },
+    new Product { Id = 8, Name = "Mishi Kobe Niku", Category = "Meat", Price = 97.00m, Stock = 29, Available = true },
+            new Product { Id = 9, Name = "Ikura", Category = "Seafood", Price = 31.00m, Stock = 31, Available = true },
+       new Product { Id = 10, Name = "Queso Cabrales", Category = "Dairy", Price = 21.00m, Stock = 22, Available = true },
+  new Product { Id = 11, Name = "Queso Manchego La Pastora", Category = "Dairy", Price = 38.00m, Stock = 86, Available = true },
+   new Product { Id = 12, Name = "Konbu", Category = "Seafood", Price = 6.00m, Stock = 24, Available = true },
+            new Product { Id = 13, Name = "Tofu", Category = "Produce", Price = 23.25m, Stock = 35, Available = true },
+          new Product { Id = 14, Name = "Genen Shouyu", Category = "Condiments", Price = 15.50m, Stock = 39, Available = true },
+   new Product { Id = 15, Name = "Pavlova", Category = "Confections", Price = 17.45m, Stock = 29, Available = true },
+            new Product { Id = 16, Name = "Alice Mutton", Category = "Meat", Price = 39.00m, Stock = 0, Available = false },
+         new Product { Id = 17, Name = "Carnarvon Tigers", Category = "Seafood", Price = 62.50m, Stock = 42, Available = true },
+            new Product { Id = 18, Name = "Teatime Chocolate Biscuits", Category = "Confections", Price = 9.20m, Stock = 25, Available = true },
+  new Product { Id = 19, Name = "Sir Rodney's Marmalade", Category = "Confections", Price = 81.00m, Stock = 40, Available = true },
+            new Product { Id = 20, Name = "Sir Rodney's Scones", Category = "Confections", Price = 10.00m, Stock = 3, Available = true },
+            new Product { Id = 21, Name = "Gustaf's Knäckebröd", Category = "Grains", Price = 21.00m, Stock = 104, Available = true },
+   new Product { Id = 22, Name = "Tunnbröd", Category = "Grains", Price = 9.00m, Stock = 61, Available = true },
+    new Product { Id = 23, Name = "Guaraná Fantástica", Category = "Beverages", Price = 4.50m, Stock = 20, Available = false },
+    new Product { Id = 24, Name = "NuNuCa Nuß-Nougat-Creme", Category = "Confections", Price = 14.00m, Stock = 76, Available = true },
+     new Product { Id = 25, Name = "Gumbär Gummibärchen", Category = "Confections", Price = 31.23m, Stock = 15, Available = true },
+ };
+    }
+
+    private void LoadEmployees()
+    {
+        employees = new List<Employee>
+        {
+            new Employee { Name = "John Doe", Department = "Engineering", Salary = 85000 },
+       new Employee { Name = "Jane Smith", Department = "Marketing", Salary = 72000 },
+  new Employee { Name = "Bob Johnson", Department = "Sales", Salary = 65000 },
+     new Employee { Name = "Alice Williams", Department = "Engineering", Salary = 92000 },
+            new Employee { Name = "Charlie Brown", Department = "HR", Salary = 58000 },
+new Employee { Name = "Diana Prince", Department = "Engineering", Salary = 95000 },
+            new Employee { Name = "Eve Adams", Department = "Marketing", Salary = 68000 },
+            new Employee { Name = "Frank Miller", Department = "Sales", Salary = 71000 },
+        };
+  }
+
+    private void HandleEdit(Product product)
+    {
+      // Handle edit logic here
+        Console.WriteLine($"Editing product: {product.Name}");
+    }
+
+    private void HandleDelete(Product product)
+    {
+        products.Remove(product);
+        StateHasChanged();
+    }
+
+    private void HandleAdd()
+    {
+        // Handle add logic here
+      Console.WriteLine("Adding new product");
+    }
+
+    private void HandleSelectionChanged(List<Product> selected)
+    {
+      selectedProducts = selected;
+    }
+
+    public class Product
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+     public string Category { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+  public int Stock { get; set; }
+     public bool Available { get; set; }
+    }
+
+    public class Employee
+    {
+     public string Name { get; set; } = string.Empty;
+     public string Department { get; set; } = string.Empty;
+        public decimal Salary { get; set; }
+    }
+}

@@ -1,0 +1,128 @@
+﻿@page "/counter"
+@rendermode InteractiveServer
+
+<PageTitle>MyButton Demo - Counter</PageTitle>
+
+<div class="container my-5">
+    <h1>MyButton Component Demo</h1>
+    <p class="lead">Interactive examples of the MyButton component</p>
+
+    <div class="row mt-4">
+   <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+    <div class="card-body">
+           <h3>Basic Counter</h3>
+     <p>Current count: <strong>@currentCount</strong></p>
+              <div class="d-flex gap-2">
+            <MyButton Icon="➕" OnClick="IncrementCount">
+        Increment
+      </MyButton>
+                <MyButton Icon="➖" OnClick="DecrementCount">
+  Decrement
+         </MyButton>
+            <MyButton Icon="🔄" OnClick="ResetCount">
+        Reset
+    </MyButton>
+     </div>
+       </div>
+      </div>
+     </div>
+
+        <div class="col-md-6">
+   <div class="card shadow-sm mb-4">
+      <div class="card-body">
+  <h3>Button States</h3>
+      <div class="d-flex flex-column gap-2">
+   <MyButton Icon="✅" OnClick="@(() => {})">
+      Normal Button
+            </MyButton>
+            <MyButton Icon="🚫" Disabled="true">
+       Disabled Button
+     </MyButton>
+     <MyButton Icon="💾" Type="submit" OnClick="@(() => {})">
+      Submit Button
+            </MyButton>
+     </div>
+     </div>
+   </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+      <div class="card shadow-sm mb-4">
+                <div class="card-body">
+   <h3>Icon Examples</h3>
+      <p>MyButton supports any emoji or icon:</p>
+ <div class="d-flex flex-wrap gap-2">
+         <MyButton Icon="🚀" OnClick="@(() => ShowToast("Launching!"))">Launch</MyButton>
+             <MyButton Icon="❤️" OnClick="@(() => ShowToast("Loved!"))">Like</MyButton>
+   <MyButton Icon="⭐" OnClick="@(() => ShowToast("Starred!"))">Favorite</MyButton>
+      <MyButton Icon="📧" OnClick="@(() => ShowToast("Email sent!"))">Send Email</MyButton>
+        <MyButton Icon="🔍" OnClick="@(() => ShowToast("Searching..."))">Search</MyButton>
+        <MyButton Icon="⚙️" OnClick="@(() => ShowToast("Settings opened!"))">Settings</MyButton>
+          <MyButton Icon="🗑️" OnClick="@(() => ShowToast("Deleted!"))">Delete</MyButton>
+           </div>
+
+       @if (!string.IsNullOrEmpty(toastMessage))
+        {
+         <div class="alert alert-info mt-3" role="alert">
+   @toastMessage
+          </div>
+        }
+    </div>
+  </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+          <div class="card shadow-sm">
+   <div class="card-body">
+            <h3>Code Example</h3>
+     <pre class="bg-light p-3 rounded"><code>&lt;MyButton Icon="➕" OnClick="IncrementCount"&gt;
+    Increment
+&lt;/MyButton&gt;
+
+@@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+ }
+}</code></pre>
+             </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int currentCount = 0;
+    private string toastMessage = string.Empty;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    private void DecrementCount()
+    {
+   currentCount--;
+    }
+
+    private void ResetCount()
+  {
+        currentCount = 0;
+    }
+
+    private async void ShowToast(string message)
+    {
+        toastMessage = message;
+        StateHasChanged();
+        await Task.Delay(2000);
+     toastMessage = string.Empty;
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,57 @@
+﻿@page "/"
+
+<PageTitle>BlazorMega - Component Library Demo</PageTitle>
+
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4">🚀 BlazorMega Component Library</h1>
+        <p class="lead">A modern, customizable Blazor component library for .NET 9</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+   <div class="card shadow-sm mb-4">
+         <div class="card-body">
+       <h2 class="card-title">Welcome to BlazorMega!</h2>
+ <p class="card-text">
+      This demo application showcases the components available in the BlazorMega library.
+           Navigate through the menu to explore different components and their features.
+         </p>
+ 
+       <h3 class="mt-4">Quick Start</h3>
+       <p>Install via NuGet:</p>
+         <pre class="bg-light p-3 rounded"><code>dotnet add package BlazorMega</code></pre>
+     
+     <h3 class="mt-4">Available Components</h3>
+      <ul>
+    <li><strong>MyButton</strong> - A customizable button with icon support and smooth animations</li>
+                <li><strong>MyGrid</strong> - A powerful data grid with sorting, filtering, paging, selection, and CRUD operations</li>
+     <li>More components coming soon!</li>
+    </ul>
+
+       <div class="mt-4">
+  <h3>Try a Quick Demo:</h3>
+<MyButton Icon="🎉" OnClick="@HandleWelcomeClick">
+                 Click Me!
+         </MyButton>
+             @if (showMessage)
+   {
+    <div class="alert alert-success mt-3" role="alert">
+         ✅ BlazorMega components are working perfectly!
+            </div>
+             }
+     </div>
+        </div>
+            </div>
+    </div>
+    </div>
+</div>
+
+@code {
+    private bool showMessage = false;
+
+    private void HandleWelcomeClick()
+{
+        showMessage = true;
+    }
+}

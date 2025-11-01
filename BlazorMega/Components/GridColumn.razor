@@ -1,0 +1,22 @@
+@namespace BlazorMega.Components
+@typeparam TItem
+
+@code {
+    [CascadingParameter] public MyGrid<TItem>? Grid { get; set; }
+    
+    [Parameter] public string? Field { get; set; }
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public bool Sortable { get; set; } = true;
+    [Parameter] public bool Filterable { get; set; } = true;
+    [Parameter] public RenderFragment<TItem>? Template { get; set; }
+    
+internal string? FilterValue { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (Grid != null)
+ {
+    Grid.AddColumn(this);
+     }
+    }
+}

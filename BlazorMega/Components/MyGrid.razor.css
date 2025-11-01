@@ -1,0 +1,227 @@
+.mega-grid {
+ width: 100%;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.mega-grid-toolbar {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.mega-grid-container {
+    overflow-x: auto;
+}
+
+.mega-grid-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+.mega-grid-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.mega-grid-table thead th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.mega-grid-table thead th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s;
+}
+
+.mega-grid-table thead th.sortable:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mega-grid-header-content {
+  display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.sort-indicator {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.filter-indicator {
+    font-size: 0.875rem;
+    opacity: 0.7;
+    cursor: pointer;
+}
+
+.filter-indicator:hover {
+    opacity: 1;
+}
+
+.mega-grid-filter-row th {
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.mega-grid-filter-input {
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+}
+
+.mega-grid-filter-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.mega-grid-table tbody tr {
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.2s;
+}
+
+.mega-grid-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.mega-grid-table tbody tr.selected {
+    background-color: rgba(102, 126, 234, 0.1);
+}
+
+.mega-grid-table tbody td {
+    padding: 1rem;
+    color: #495057;
+    font-size: 0.9375rem;
+}
+
+.mega-grid-checkbox-column {
+    width: 50px;
+    text-align: center;
+}
+
+.mega-grid-checkbox-column input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+.mega-grid-command-column {
+    width: 200px;
+    text-align: center;
+}
+
+.mega-grid-commands {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.mega-grid-no-data {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.mega-grid-no-data-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    color: #6c757d;
+}
+
+.mega-grid-no-data-content span {
+    font-size: 3rem;
+}
+
+.mega-grid-no-data-content p {
+    font-size: 1.125rem;
+    margin: 0;
+}
+
+.mega-grid-pager {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+ display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.pager-info {
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.pager-buttons {
+    display: flex;
+    gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+/* Button size modifiers for grid */
+.btn-mega.btn-small {
+  padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    border-radius: 1.5rem;
+}
+
+.btn-mega.btn-small.active {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.btn-mega.btn-danger {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    box-shadow: 0 4px 6px rgba(245, 87, 108, 0.25);
+}
+
+.btn-mega.btn-danger:hover:not(:disabled) {
+    background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+    box-shadow: 0 8px 15px rgba(245, 87, 108, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .mega-grid-pager {
+    flex-direction: column;
+        text-align: center;
+    }
+
+    .pager-buttons {
+      justify-content: center;
+  }
+
+    .mega-grid-table {
+        font-size: 0.875rem;
+    }
+
+    .mega-grid-table thead th,
+    .mega-grid-table tbody td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .mega-grid-commands {
+        flex-direction: column;
+    }
+}
